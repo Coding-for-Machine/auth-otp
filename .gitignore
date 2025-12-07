@@ -1,4 +1,8 @@
 # Byte-compiled / optimized / DLL files
+myenvbot
+bot_database.*
+private.*
+public.*
 __pycache__/
 *.py[codz]
 *$py.class
