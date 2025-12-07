@@ -28,3 +28,12 @@ docker build -t my-auth-server .
 ```bash
 docker run -it --name my-auth-server-container -p 8080:8080 my-auth-server
 ```
+
+.env file yarating
+```bash
+# Telegram bot token
+TOKEN=83VQ5WyqeLgA0mxtZ4jai0
+
+# JWT / Secret key
+SECRET_KEY=a-sits-long
+```
