@@ -26,7 +26,22 @@ async def cors_middleware(request, handler):
 # Auth Middleware
 @web.middleware
 async def auth_middleware(request, handler):
-    protected = {"/api/user"}  # faqat token talab qilinadigan routelar
+    protected = {"/api/user"}
+    """
+        Auth Middleware
+
+        Bu middleware quyidagilarni bajaradi:
+
+        1. Faqat `protected` ro‘yxatidagi routelarda token talab qilinadi.
+        2. Request header-dan "Authorization" maydonini oladi.
+        3. Agar token mavjud bo‘lmasa, 401 status bilan xato qaytaradi.
+        4. Agar token noto‘g‘ri formatda bo‘lsa, 401 status bilan xato qaytaradi.
+        5. Token orqali Session bazasidan foydalanuvchi sessiyasini tekshiradi.
+        6. Agar token mos kelmasa, 401 status bilan xato qaytaradi.
+        7. Foydalanuvchi sessiyasi topilsa, request obyektiga `user_id` qo‘shiladi.
+        Shu bilan har bir endpoint ichida `request["user_id"]` orqali
+        hozirgi foydalanuvchini aniqlash mumkin.
+    """
 
     if request.path in protected:
         auth = request.headers.get("Authorization")
@@ -68,6 +83,21 @@ async def health_check(request):
 
 
 async def otp_login(request):
+    """
+    Tizimga kirish uchin login qilganda foydalanovchidan
+    faqat http request body uchin otp_code talab qilinadi!.
+    otp_code --> bu string formatda va raqamlardan iborat
+    masalan: "152535".
+    opt_code uzinligi(length) 6 ta belgidan iborat bo'lish talab qilinadi.
+    Json format:
+        {
+            "otp_code": "123456"
+        }
+    Http request:
+        curl -X POST "http://localhost:8080/login" \
+            -H "Content-Type: application/json" \
+            -d '{"otp_code": "123456"}'
+    """
     try:
         payload = OTPSchema(**await request.json())
     except ValidationError as e:
@@ -93,6 +123,20 @@ async def otp_login(request):
 
 
 async def get_user(request):
+    """
+    Foydalanavchi ma'lumotlarini olish uchin u ro'yxatddan o'tgan bo'lishi lozim.
+    auth_middleware funksiyasi foydalanovchi jwt(json web token) ni tekshiradi.
+    HTTP GET --> /api/user endpoint
+    HTTP Response:
+        {
+            "user": {
+                "full_name": "",
+                "telegram_id": 0,
+                "created_at": 2024-12-7 ...,
+                "last_login": 2024-12-8 ...,
+            }
+        }
+    """
     user = await User.get(id=request["user_id"])
     session = await Session.get_or_none(user_id=user.id)  # oxirgi session
 
@@ -105,11 +149,11 @@ async def get_user(request):
             "created_at": str(user.created_at),
             "last_login": last_login_time,
         },
-        "stats": {"active": True}
     })
 
 
 async def verify(request):
+    
     return web.Response(status=200)  # middleware tekshiradi
 
 
