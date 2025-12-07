@@ -34,7 +34,7 @@ def create_token(
 
 def verify_token(token: str):
     try:
-        data = jwt.decode(token, PUBLIC_KEY, algorithms=["HS256"])
+        data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
         return data
     except jwt.ExpiredSignatureError:
         return None
