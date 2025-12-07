@@ -16,7 +16,7 @@ class User(models.Model):
 
 class Session(models.Model):
     id = fields.BigIntField(pk=True)
-    user = fields.OneToOneField("models.User", related_name="sessions", on_delete=fields.CASCADE)
+    user = fields.OneToOneField("models.User", rrelated_name="session", on_delete=fields.CASCADE)
     secret_key = fields.CharField(max_length=150, null=True)
     jwt_token = fields.TextField(null=True)
     created_at = fields.DatetimeField(auto_now_add=True)

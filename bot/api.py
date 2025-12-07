@@ -26,7 +26,7 @@ async def cors_middleware(request, handler):
 # Auth Middleware
 @web.middleware
 async def auth_middleware(request, handler):
-    protected = {"/api/user"}
+    protected = {"/api/user", "/api/verify"}
     """
         Auth Middleware
 
@@ -112,13 +112,26 @@ async def otp_login(request):
     if data is None or expire_at is None or expire_at < time.time():
         return web.json_response({"error": "OTP expired or invalid"}, status=400)
 
-    # Sessionni topamiz
+
     session = await Session.get_or_none(secret_key=data)
     if not session:
         return web.json_response({"error": "Invalid session"}, status=400)
+    
+    last_login_time = str(session.last_login)
+    # Userni olish
+    user = await User.get(id=session.user_id)
 
-    return web.json_response({"token": session.jwt_token})
-
+    return web.json_response({
+        "token": session.jwt_token,
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "phone": user.phone,
+            "full_name": user.full_name,
+            "telegram_id": user.telegram_id,
+            "last_login": last_login_time,
+        }
+    })
 
 
 
@@ -138,19 +151,23 @@ async def get_user(request):
         }
     """
     user = await User.get(id=request["user_id"])
-    session = await Session.get_or_none(user_id=user.id)  # oxirgi session
-
-    last_login_time = str(session.last_login) if session else None
+    
+    try:
+        session = await user.session
+        last_login_time = str(session.last_login)
+    except:
+        last_login_time = None
 
     return web.json_response({
         "user": {
+            "id": user.id,
+            "username": user.username,
+            "phone": user.phone,
             "full_name": user.full_name,
             "telegram_id": user.telegram_id,
-            "created_at": str(user.created_at),
             "last_login": last_login_time,
-        },
+        }
     })
-
 
 async def verify(request):
     
@@ -159,9 +176,9 @@ async def verify(request):
 
 app.add_routes([
     web.get("/", health_check),
-    web.post("/login", otp_login),
+    web.post("/api/login", otp_login),
     web.get("/api/user", get_user),
-    web.get("/verify", verify),
+    web.get("/api/verify", verify),
 ])
 
 
