@@ -71,7 +71,7 @@ async def contact_handler(message: Message):
         user.username = username
         await user.save()
         await message.answer(
-            f"Salom <b>{full_name}</b>! Siz allaqachon ro'yxatdan o'tgansiz.\n✅ /login buyrug'ini bosing.",
+            f"Salom <b>{full_name}</b>! Siz allaqachon ro'yxatdan o'tgansiz.\n /login buyrug'ini bosing.",
             parse_mode=ParseMode.HTML
         )
         return

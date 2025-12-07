@@ -37,3 +37,16 @@ TOKEN=83VQ5WyqeLgA0mxtZ4jai0
 # JWT / Secret key
 SECRET_KEY=a-sits-long
 ```
+## --Bot uchin foydalaning--
+```bash
+❤️‍🔥 💸 💯 🔥 🐳 🍉 🚀 😎 🫡 🫠
+🫶 🫰 🫢 🫣 🫡 🫨 🦄 🦊 🐼 🐧
+🌌 🌃 🌠 🪐 🌈 🌊 🌋 🌴 🌵 🌻
+🍔 🍟 🌭 🍕 🍫 🍩 🍭 🍹 🍷 🥂
+🥳 🤩 😍 🥰 😂 🤯 🤬 🤡 👻 💀
+🤖 👾 🎃 🐉 🦖 🐲 🦕 🐢 🐙 🦑
+⚡️ 🌟 ✨ 💫 🎇 🎆 🪄 🎉 🎊 🎀
+🏆 🎯 🎮 🎲 🎰 🎪 🎭 🎨 🎼 🎤
+🎧 🎹 🥁 🎺 🎻 🎷 🪕 🛸 🚁 🚂
+🚗 🏍 🚤 ✈️ 🚀 🚢 🛶 ⛵️ 🚲 🛴
+```
