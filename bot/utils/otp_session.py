@@ -11,7 +11,6 @@ async def create_or_get_session(user_id: int, phone: str):
         return None, None, None, False
 
     session = await Session.get_or_none(user_id=user.id)
-    secret = pyotp.random_base32() if not session else session.secret_key or pyotp.random_base32()
 
     # Cache tekshiruvi
     otp_code, expire_at = get_cache(user_id)
@@ -19,6 +18,7 @@ async def create_or_get_session(user_id: int, phone: str):
         # Eskirmagan OTP mavjud
         return user, otp_code, session.jwt_token if session else None, True
 
+    secret = pyotp.random_base32() if not session else session.secret_key or pyotp.random_base32()
     # Yangi OTP yaratish
     totp = pyotp.TOTP(secret, interval=60)
     otp_code = totp.now()
@@ -45,4 +45,5 @@ async def create_or_get_session(user_id: int, phone: str):
         )
 
     set_cache(otp_code, secret, cache_time=60)
+    set_cache(user_id, otp_code, cache_time=60)
     return user, otp_code, jwt_token, False

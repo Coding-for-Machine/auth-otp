@@ -124,11 +124,10 @@ async def otp_login(request):
     return web.json_response({
         "token": session.jwt_token,
         "user": {
-            "id": user.id,
+            "user_id": user.telegram_id,
             "username": user.username,
             "phone": user.phone,
             "full_name": user.full_name,
-            "telegram_id": user.telegram_id,
             "last_login": last_login_time,
         }
     })
@@ -160,11 +159,10 @@ async def get_user(request):
 
     return web.json_response({
         "user": {
-            "id": user.id,
+            "user_id": user.telegram_id,
             "username": user.username,
             "phone": user.phone,
             "full_name": user.full_name,
-            "telegram_id": user.telegram_id,
             "last_login": last_login_time,
         }
     })

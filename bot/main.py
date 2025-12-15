@@ -3,7 +3,7 @@ import asyncio
 from aiohttp import web
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command
-from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from aiogram.enums import ParseMode
 from decouple import config
 import api
@@ -14,6 +14,7 @@ TOKEN = config("TOKEN")
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+# ===================== Keyboard =====================
 keyboard = ReplyKeyboardMarkup(
     keyboard=[[KeyboardButton(text="📱 Telefon raqamni yuborish", request_contact=True)]],
     resize_keyboard=True,
@@ -29,28 +30,20 @@ async def send_otp(message: Message, otp_code: str):
         "❗ Iltimos, bu kodni hech kimga ko‘rsatmang."
     )
     await message.answer(html_text, parse_mode=ParseMode.HTML)
-    await message.answer(
-        "⚡️",
-    )
+    await message.answer("⚡️")
 
 # ===================== /start handler =====================
 @dp.message(Command("start"))
 async def start_handler(message: Message):
-    await message.answer(
-        "🏆",
-    )
-    await message.answer(
-        "✨",
-    )
-    
-    await message.answer(
-        "💯",
-    )
+    await message.answer("🏆")
+    await message.answer("✨")
+    await message.answer("💯")
     await message.answer(
         "Salom! Ro‘yxatdan o‘tish uchun telefon raqamingizni yuboring 👇",
-        reply_markup=keyboard,
+        reply_markup=keyboard
     )
 
+# ===================== Kontakt handler =====================
 @dp.message(lambda message: message.contact is not None)
 async def contact_handler(message: Message):
     user_id = message.from_user.id
@@ -72,7 +65,8 @@ async def contact_handler(message: Message):
         await user.save()
         await message.answer(
             f"Salom <b>{full_name}</b>! Siz allaqachon ro'yxatdan o'tgansiz.\n /login buyrug'ini bosing.",
-            parse_mode=ParseMode.HTML
+            parse_mode=ParseMode.HTML,
+            reply_markup=ReplyKeyboardRemove()
         )
         return
 
@@ -80,16 +74,16 @@ async def contact_handler(message: Message):
     user, otp_code, jwt_token, is_cached = await create_or_get_session(user_id, phone)
 
     if is_cached:
+        await message.answer("🤖", reply_markup=ReplyKeyboardRemove())
         await message.answer(
             "⚠️ Sizning OTP kodingiz o'zgarmagan.\n⏳ Iltimos, mavjud kodni ishlating.",
             parse_mode=ParseMode.HTML
         )
     else:
-        await message.answer(
-        "🎉",
-        )
+        await message.answer("🎉", reply_markup=ReplyKeyboardRemove())
         await send_otp(message, otp_code)
 
+# ===================== /login handler =====================
 @dp.message(Command("login"))
 async def login_handler(message: Message):
     user_id = message.from_user.id
@@ -104,19 +98,19 @@ async def login_handler(message: Message):
 
     # OTP + JWT
     user, otp_code, jwt_token, is_cached = await create_or_get_session(user_id, user.phone)
-
-
     await user.save()
 
     if is_cached:
-        await message.answer("⚠️ Sizning OTP kodingiz o'zgarmagan.\n⏳ Iltimos, mavjud kodni ishlating.", parse_mode=ParseMode.HTML)
-    else:
+        await message.answer("☝️", reply_markup=ReplyKeyboardRemove())
         await message.answer(
-        "💯",
+            "⚠️ Sizning OTP kodingiz o'zgarmagan.\n⏳ Iltimos, mavjud kodni ishlating.",
+            parse_mode=ParseMode.HTML
         )
+    else:
+        await message.answer("💯", reply_markup=ReplyKeyboardRemove())
         await send_otp(message, otp_code)
 
-
+# ===================== Main =====================
 async def main():
     # DB va API server
     await api.init_db()
