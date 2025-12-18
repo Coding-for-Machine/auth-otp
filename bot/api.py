@@ -186,10 +186,10 @@ import ssl
 
 async def init_db():
     ssl_ctx = ssl.create_default_context()
-    DB_HOST = config("HOST")
+    DB_HOST = config("DB_HOST")
     BD_USER = config("BD_USER")
-    DB_PASSWORD = config("PASSWORD")
-    DB_DATABASE = config("DATABASE")
+    DB_PASSWORD = config("DB_PASSWORD")
+    DB_DATABASE = config("DB_DATABASE")
     await Tortoise.init(
         config={
             "connections": {
