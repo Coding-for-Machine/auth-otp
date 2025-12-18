@@ -186,18 +186,21 @@ import ssl
 
 async def init_db():
     ssl_ctx = ssl.create_default_context()
-
+    DB_HOST = config("HOST")
+    BD_USER = config("BD_USER")
+    DB_PASSWORD = config("PASSWORD")
+    DB_DATABASE = config("DATABASE")
     await Tortoise.init(
         config={
             "connections": {
                 "default": {
                     "engine": "tortoise.backends.asyncpg",
                     "credentials": {
-                        "host": "ep-winter-sound-a9h3294n-pooler.gwc.azure.neon.tech",
+                        "host": DB_HOST,
                         "port": 5432,
-                        "user": "neondb_owner",
-                        "password": "npg_X5xomKtBk3aU",
-                        "database": "neondb",
+                        "user": BD_USER,
+                        "password": DB_PASSWORD,
+                        "database": DB_DATABASE,
                         "ssl": ssl_ctx,
                     },
                 }
