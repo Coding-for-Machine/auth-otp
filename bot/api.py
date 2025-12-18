@@ -182,16 +182,38 @@ app.add_routes([
 ])
 
 
+import ssl
+
 async def init_db():
-    DB_URL = config("DATABASE_URL")
+    ssl_ctx = ssl.create_default_context()
 
     await Tortoise.init(
-        db_url=DB_URL,
-        modules={"models": ["utils.database"]},
+        config={
+            "connections": {
+                "default": {
+                    "engine": "tortoise.backends.asyncpg",
+                    "credentials": {
+                        "host": "ep-winter-sound-a9h3294n-pooler.gwc.azure.neon.tech",
+                        "port": 5432,
+                        "user": "neondb_owner",
+                        "password": "npg_X5xomKtBk3aU",
+                        "database": "neondb",
+                        "ssl": ssl_ctx,
+                    },
+                }
+            },
+            "apps": {
+                "models": {
+                    "models": ["utils.database"],
+                    "default_connection": "default",
+                }
+            },
+        }
     )
 
     await Tortoise.generate_schemas()
-    print("PostgreSQL Ready")
+    print("PostgreSQL (Neon SSL) Ready")
+
 
 
 if __name__ == "__main__":
