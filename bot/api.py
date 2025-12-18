@@ -5,7 +5,8 @@ from pydantic import BaseModel, validator, ValidationError
 from tortoise import Tortoise
 from utils.cache import get_cache
 from utils.database import Session, User
-from pydantic import config
+from decouple import config
+
 
 
 # CORS Middleware
