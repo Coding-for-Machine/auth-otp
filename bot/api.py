@@ -5,6 +5,7 @@ from pydantic import BaseModel, validator, ValidationError
 from tortoise import Tortoise
 from utils.cache import get_cache
 from utils.database import Session, User
+from pydantic import config
 
 
 # CORS Middleware
@@ -181,12 +182,15 @@ app.add_routes([
 
 
 async def init_db():
+    DB_URL = config("DATABASE_URL")
+
     await Tortoise.init(
-        db_url="sqlite://bot_database.sqlite3",
+        db_url=DB_URL,
         modules={"models": ["utils.database"]},
     )
+
     await Tortoise.generate_schemas()
-    print("SQLite Ready")
+    print("PostgreSQL Ready")
 
 
 if __name__ == "__main__":
