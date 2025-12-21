@@ -1,4 +1,3 @@
-# bot/main.py
 import asyncio
 from aiohttp import web
 from aiogram import Bot, Dispatcher
@@ -118,7 +117,7 @@ async def main():
     await runner.setup()
     site = web.TCPSite(runner, "0.0.0.0", 8080)
     await site.start()
-    print("🚀 API server: http://localhost:8080")
+    print(f"API server: {0}", "0.0.0.0:8080")
 
     # Bot polling
     polling_task = asyncio.create_task(dp.start_polling(bot))
@@ -131,6 +130,7 @@ async def main():
         except Exception:
             pass
         from tortoise import Tortoise
+        # Tortoise ORM to'g'ri uzmamiz Postgrsqldan.
         await Tortoise.close_connections()
 
 if __name__ == "__main__":

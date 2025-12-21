@@ -1,4 +1,3 @@
-# bot/api.py
 import time
 from aiohttp import web
 from pydantic import BaseModel, validator, ValidationError
@@ -14,8 +13,8 @@ from decouple import config
 async def cors_middleware(request, handler):
     if request.method == "OPTIONS":
         return web.Response(headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Origin": "*", # server ip yoke DNS --> (Hozir hammaga ro'xsat bor "*")
+            "Access-Control-Allow-Methods": "GET, POST",
             "Access-Control-Allow-Headers": "Content-Type, Authorization",
         })
 
@@ -64,7 +63,7 @@ async def auth_middleware(request, handler):
     return await handler(request)
 
 
-# ===== Request Schemas =====
+#  Request Schemas
 class OTPSchema(BaseModel):
     otp_code: str
 
@@ -170,7 +169,10 @@ async def get_user(request):
     })
 
 async def verify(request):
-    
+    """
+    Bu funksiya faqat status konni qaytaradi.
+    Qolgan ishni (middleware) hal qiladi.
+    """
     return web.Response(status=200)  # middleware tekshiradi
 
 

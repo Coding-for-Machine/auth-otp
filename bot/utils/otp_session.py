@@ -1,4 +1,3 @@
-# bot/utils/otp_session.py
 import pyotp
 import time
 from utils.cache import get_cache, set_cache
@@ -6,13 +5,20 @@ from utils.jwt_ import create_token
 from utils.database import User, Session
 
 async def create_or_get_session(user_id: int, phone: str):
+    """
+    Bu funksiya asosiy maqsadlari:
+        1 - foydalonavchi user(table) jadvaldan oladi
+        2 - foydalanovchi session(table) jadvaldan foydalanovchi sissiyasini oladi
+        3 - Ram cache dan userni tekshiradi(user_id) agar foydalanovchi otp(one time password) eskirmagan bulsa session(table) dan (return user, otp_code, session.jwt_token if session else None, True) qaytaradi
+        4 - Ram cache ga opt ni key sifatida saqlaydi 
+    """
     user = await User.get_or_none(telegram_id=user_id)
     if not user:
         return None, None, None, False
 
     session = await Session.get_or_none(user_id=user.id)
 
-    # Cache tekshiruvi
+    # Cache tekshiramiz
     otp_code, expire_at = get_cache(user_id)
     if otp_code and expire_at and expire_at > time.time():
         # Eskirmagan OTP mavjud

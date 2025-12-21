@@ -36,6 +36,12 @@ TOKEN=83VQ5WyqeLgA0mxtZ4jai0
 
 # JWT / Secret key
 SECRET_KEY=a-sits-long
+
+# PostgreSQL
+DB_HOST=ep-wintr.gwc.azure.neon.tech
+BD_USER=neo_owner
+DB_PASSWORD=mKtBk3aU
+DB_DATABASE=db
 ```
 ## --Bot uchin foydalaning--
 ```bash
