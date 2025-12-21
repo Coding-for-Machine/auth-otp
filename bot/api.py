@@ -2,11 +2,35 @@ import time
 from aiohttp import web
 from pydantic import BaseModel, validator, ValidationError
 from tortoise import Tortoise
-from utils.cache import get_cache
+from utils.cache import get_cache, set_cache
 from utils.database import Session, User
 from decouple import config
 
+#  Request Schemas
+class OTPSchema(BaseModel):
+    otp_code: str
 
+    @validator("otp_code")
+    def otp_must_be_six_digits(cls, v):
+        if not v.isdigit() or len(v) != 6:
+            raise ValueError("OTP 6 xonali bo‘lishi kerak")
+        return v
+
+# RATE Limit
+@web.middleware
+async def rate_limit_middleware(request, handler):
+    ip = request.remote or "ip"
+    key = f"rate:{ip}:{request.path}:{request.method}"
+    data, expire_at = get_cache(key)
+    now = time.time()
+    if data is None:
+        set_cache(key, 1, 10)
+    else:
+        if data >= 5:  # maksimal 5 so'rov
+            return web.json_response({"error": "Too many requests"}, status=429)
+        set_cache(key, data + 1, int(expire_at - now))
+    
+    return await handler(request)
 
 # CORS Middleware
 @web.middleware
@@ -63,19 +87,10 @@ async def auth_middleware(request, handler):
     return await handler(request)
 
 
-#  Request Schemas
-class OTPSchema(BaseModel):
-    otp_code: str
-
-    @validator("otp_code")
-    def otp_must_be_six_digits(cls, v):
-        if not v.isdigit() or len(v) != 6:
-            raise ValueError("OTP 6 xonali bo‘lishi kerak")
-        return v
 
 
 #  App 
-app = web.Application(middlewares=[cors_middleware, auth_middleware])
+app = web.Application(middlewares=[cors_middleware, rate_limit_middleware, auth_middleware])
 
 
 #  health 
@@ -105,6 +120,16 @@ async def otp_login(request):
         return web.json_response({"error": str(e)}, status=400)
 
     otp = payload.otp_code
+    ip = request.remote or "ip"
+    otp_key = f"otp:{ip}:{otp}"
+
+    data, expire_at = get_cache(otp_key)
+    if data is None:
+        set_cache(otp_key, 1, 60)  # 1 minut ichida 2 ta urinish opt code orqali.
+    elif data > 2:
+        return web.json_response({"error": "Too many OTP attempts"}, status=429)
+    else:
+        set_cache(otp_key, data + 1, int(expire_at - time.time()))
 
     # Cache dan olish
     data, expire_at = get_cache(otp)
